@@ -3,22 +3,15 @@
 // ajax call out
 // parse return
 
-// createdAt: "2015-09-01T01:00:42.028Z"
-// objectId: "hwhupXO0iX"
-// roomname: "4chan"
-// text: "trololo"
-// updatedAt: "2015-09-01T01:00:42.028Z"
-// username: "shawndrost"
-
 var myDataStore = {};
 
 function getMessages() {
   $.ajax({
     // This is the url you should use to communicate with the parse API server.
     // 'where={"playerName":"Sean Plott","cheatMode":false}'
-    url: 'https://api.parse.com/1/classes/chatterbox?order=-createdAt&limit=1000',
+    url: 'https://api.parse.com/1/classes/chatterbox',
     method: 'GET',
-    data: 'text',
+    data: {'order':'-createdAt', 'limit':'1000'},
     contentType: 'application/json',
     success: function (data) {
       console.log('chatterbox: Message received. Data: ', data);
@@ -35,6 +28,7 @@ function getMessages() {
   });
 }
 
+// this puts together a message in HTML to display on page
 function buildMessage(index) {
   var picture, username, time, text, message;
   picture = '<div class="userpic"></div>';
@@ -49,7 +43,7 @@ function buildMessage(index) {
 function appendMessages(index) {
   var counter;
   var message;
-  var remaining = index - myDataStore.messages.length;
+  var remaining = myDataStore.messages.length - index;
 
   if (remaining < 25) {
     counter = remaining;
@@ -67,7 +61,52 @@ function appendMessages(index) {
   myDataStore.index = index;
 }
 
+// sends a json object to Parse server
+function postMessage(newMessage) {
+  $.ajax({
+    url: 'https://api.parse.com/1/classes/chatterbox',
+    method: 'POST',
+    data: newMessage,
+    contentType: 'application/json',
+    success: function(){
+      console.log('Message was sent! Message = ' + newMessage);
+      $('.messageText').val('');
+      $('.holdsMessages').html('');
+      getMessages();
+    },
+    error: function(error){
+      console.log('Failed to send message! Error: ' + error);
+    }
+  });
+}
+
+// createdAt: "2015-09-01T01:00:42.028Z"
+// objectId: "hwhupXO0iX"
+// roomname: "4chan"
+// text: "trololo"
+// updatedAt: "2015-09-01T01:00:42.028Z"
+// username: "shawndrost"
+
+// builds a json object from form submissions
+function buildMessageObject(user, time, text) {
+  // take data about message: text, user, date, room
+  // build object to be passed to server
+  var messageObject = {
+    roomname: '',
+    text: text,
+    username: user
+  };
+  console.log(messageObject);
+  // return object to be sent
+  return messageObject;
+}
+
 $(document).ready(function() {
+  // this gets URL of page
+  var URL = window.location.search;
+  //calling reg expression, it returns an array, the second is what we want
+  myDataStore.username = /username=(.*)/.exec(URL)[1];
+  // initial getMessages and apply them to the page
   getMessages();
 
   $('.getOld').on('click', function(){
@@ -75,9 +114,24 @@ $(document).ready(function() {
   });
 
   $('.refresh').on('click', function(){
-    //these are two ways to do the same "clear when new things appear" behavior
+    // these are two ways to do the same "clear when new things appear" behavior
     // $('.message').remove();
     $('.holdsMessages').html('');
     getMessages();
   });
+
+  $('.messageSubmit').on('click', function(){
+    var message, createdAt, room, messageObject;
+    message = $('.messageText').val();
+    createdAt = new Date().toISOString();
+    messageObject = buildMessageObject(myDataStore.username, createdAt, message);
+    messageObject = JSON.stringify(messageObject);
+    postMessage(messageObject);
+  });
 });
+
+
+
+
+
+
