@@ -15,7 +15,8 @@ var myDataStore = {};
 function getMessages() {
   $.ajax({
     // This is the url you should use to communicate with the parse API server.
-    url: 'https://api.parse.com/1/classes/chatterbox',
+    // 'where={"playerName":"Sean Plott","cheatMode":false}'
+    url: 'https://api.parse.com/1/classes/chatterbox?order=-createdAt&limit=1000',
     method: 'GET',
     data: 'text',
     contentType: 'application/json',
@@ -24,7 +25,7 @@ function getMessages() {
       // store fetched messages on myDataStore object
       myDataStore.messages = data.results;
       // index is the newest message, ie, last in returned array
-      myDataStore.index = data.results.length - 1;
+      myDataStore.index = 0;
       appendMessages(myDataStore.index);
     },
     error: function (data) {
@@ -48,9 +49,10 @@ function buildMessage(index) {
 function appendMessages(index) {
   var counter;
   var message;
+  var remaining = index - myDataStore.messages.length;
 
-  if (index < 24) {
-    counter = index + 1;
+  if (remaining < 25) {
+    counter = remaining;
   }
   else {
     counter = 25;
@@ -60,7 +62,7 @@ function appendMessages(index) {
     message = buildMessage(index);
     $('.holdsMessages').append(message);
     counter--;
-    index--;
+    index++;
   }
   myDataStore.index = index;
 }
