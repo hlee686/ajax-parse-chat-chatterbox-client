@@ -40,7 +40,7 @@ function buildMessage(index) {
   username = '<div class="username">' + myDataStore.messages[index].username + '</div>';
   time = '<div class="createdAt">' + myDataStore.messages[index].createdAt + '</div>';
   text = '<div class="text">' + myDataStore.messages[index].text + '</div>';
-  message = picture + username + time + text;
+  message ='<div class="message">' + picture + username + time + text + '</div>';
   return message;
 }
 
@@ -58,7 +58,7 @@ function appendMessages(index) {
 
   while(counter) {
     message = buildMessage(index);
-    $('.allMessages').append(message);
+    $('.holdsMessages').append(message);
     counter--;
     index--;
   }
@@ -67,4 +67,15 @@ function appendMessages(index) {
 
 $(document).ready(function() {
   getMessages();
+
+  $('.getOld').on('click', function(){
+    appendMessages(myDataStore.index);
+  });
+
+  $('.refresh').on('click', function(){
+    //these are two ways to do the same "clear when new things appear" behavior
+    // $('.message').remove();
+    $('.holdsMessages').html('');
+    getMessages();
+  });
 });
