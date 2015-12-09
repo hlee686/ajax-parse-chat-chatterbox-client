@@ -18,9 +18,19 @@
       <!-- Your HTML goes here! -->
 
       <div class="userInput">
-        <select id='#'><option value='Channel'>Channel</option></select>
+        <select id='roomList'>
+          <option class='roomName' value='allRooms'>All Rooms</option>
+        </select>
+        <form id='newRoom'>
+          <fieldset class='roomField'>
+          <legend class='roomLegend'>Create new room:
+            <input class='newRoomName' type='text'>
+            <button class='submitRoom' type='button'>Create</button>
+          </legend>
+          </fieldset>
+        </form>
         <form id='userMessage'>
-          <textarea class='messageText'></textarea>
+          <textarea class='messageText' type='text'></textarea>
           <button class='messageSubmit' type='button'>Submit</button>
         </form>
       </div>
